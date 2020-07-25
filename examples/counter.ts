@@ -5,7 +5,11 @@
 
 import {Store} from 'https://raw.githubusercontent.com/felixblaschke/store-o-saurus/master/mod.ts';
 
-const counter = await Store.open<{value: number}>('counter', {
+interface Counter {
+    value: number
+}
+
+const counter = await Store.open<Counter>('counter', {
     default: {value: 0}
 });
 
