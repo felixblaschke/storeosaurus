@@ -1,3 +1,8 @@
+/**
+ * Run example with:
+ * deno run --allow-net --allow-read=. --allow-write=. https://raw.githubusercontent.com/felixblaschke/store-o-saurus/master/examples/backend.ts
+ */
+
 import {Application, Router} from 'https://deno.land/x/oak/mod.ts';
 import {oakCors} from 'https://deno.land/x/cors/mod.ts';
 import {Store} from 'https://raw.githubusercontent.com/felixblaschke/store-o-saurus/master/mod.ts';

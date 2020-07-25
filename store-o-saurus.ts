@@ -51,7 +51,7 @@ export class Store<T> {
             }
         } catch (e) {
             if (e instanceof Deno.errors.NotFound) {
-                // its okay
+                this.data = {} as T;
             } else {
                 throw e;
             }
