@@ -1,6 +1,6 @@
-import {Application, Router, send} from 'https://deno.land/x/oak/mod.ts';
+import {Application, Router} from 'https://deno.land/x/oak/mod.ts';
 import {oakCors} from 'https://deno.land/x/cors/mod.ts';
-import {Store} from '../store-o-saurus.ts';
+import {Store} from 'https://raw.githubusercontent.com/felixblaschke/store-o-saurus/master/mod.ts';
 
 interface MyList {
     todos: string[]
@@ -13,10 +13,7 @@ const myList = await Store.open<MyList>('my-list', {
 const router = new Router();
 router
     .get('/', async (context) => {
-        await send(context, context.request.url.pathname, {
-            root: `${Deno.cwd()}`,
-            index: 'backend.html',
-        });
+        context.response.body = await (await fetch("https://raw.githubusercontent.com/felixblaschke/store-o-saurus/master/examples/backend.html")).text()
     })
     .get('/todo', async (context) => {
         await myList.read(data => context.response.body = data.todos);

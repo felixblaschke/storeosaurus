@@ -1,2 +1,4 @@
 .idea/
 testing/
+examples/my-list.store.json
+examples/counter.store.json
