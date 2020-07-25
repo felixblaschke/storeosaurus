@@ -1,4 +1,4 @@
-# Store-o-saurus
+# Storeosaurus
 
 Super simple JSON store for [Deno](https://deno.land).
 
@@ -9,7 +9,7 @@ Super simple JSON store for [Deno](https://deno.land).
 - Use `write()` and `read()` methods of your store instance
 
 ```typescript
-import {Store} from 'https://raw.githubusercontent.com/felixblaschke/store-o-saurus/master/mod.ts';
+import {Store} from 'https://raw.githubusercontent.com/felixblaschke/storeosaurus/master/mod.ts';
 
 interface Counter {
     value: number

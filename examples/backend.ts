@@ -1,11 +1,11 @@
 /**
  * Run example with:
- * deno run --allow-net --allow-read=. --allow-write=. https://raw.githubusercontent.com/felixblaschke/store-o-saurus/master/examples/backend.ts
+ * deno run --allow-net --allow-read=. --allow-write=. https://raw.githubusercontent.com/felixblaschke/storeosaurus/master/examples/backend.ts
  */
 
 import {Application, Router} from 'https://deno.land/x/oak/mod.ts';
 import {oakCors} from 'https://deno.land/x/cors/mod.ts';
-import {Store} from 'https://raw.githubusercontent.com/felixblaschke/store-o-saurus/master/mod.ts';
+import {Store} from 'https://raw.githubusercontent.com/felixblaschke/storeosaurus/master/mod.ts';
 
 interface MyList {
     todos: string[]
@@ -18,7 +18,7 @@ const myList = await Store.open<MyList>('my-list', {
 const router = new Router();
 router
     .get('/', async (context) => {
-        context.response.body = await (await fetch("https://raw.githubusercontent.com/felixblaschke/store-o-saurus/master/examples/backend.html")).text()
+        context.response.body = await (await fetch("https://raw.githubusercontent.com/felixblaschke/storeosaurus/master/examples/backend.html")).text()
     })
     .get('/todo', async (context) => {
         await myList.read(data => context.response.body = data.todos);

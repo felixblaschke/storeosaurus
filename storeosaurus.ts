@@ -2,16 +2,16 @@ export class Store<T> {
 
     private data: T = {} as T;
 
-    static async open<U>(storeName: string = 'default', options: StoreOptions<U>) {
-        const store = new Store<U>(storeName);
+    static async open<U>(storeName: string = 'default', options?: StoreOptions<U>) {
+        const store = new Store<U>(options?.filePath || `${this.name}.store.json`);
 
-        if (options.default) {
+        if (options?.default) {
             await store.applyDefault(options.default)
         }
         return store;
     }
 
-    private constructor(private name: string) {
+    private constructor(private filePath: string) {
     }
 
     async read(fn: (data: T) => any) {
@@ -45,7 +45,7 @@ export class Store<T> {
 
     private async loadJsonFromDisk() {
         try {
-            const file = await Deno.readTextFile(this.fileName());
+            const file = await Deno.readTextFile(this.filePath);
             if (file) {
                 this.data = JSON.parse(file) as T;
             }
@@ -59,14 +59,12 @@ export class Store<T> {
     }
 
     private async markDataDirty() {
-        await Deno.writeTextFile(this.fileName(), JSON.stringify(this.data));
+        await Deno.writeTextFile(this.filePath, JSON.stringify(this.data));
     }
 
-    private fileName() {
-        return `${this.name}.store.json`;
-    }
 }
 
 interface StoreOptions<T> {
-    default: T
+    default?: T;
+    filePath: string;
 }

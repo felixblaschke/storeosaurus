@@ -1,1 +1,1 @@
-export {Store} from './store-o-saurus.ts';
+export {Store} from './storeosaurus.ts';

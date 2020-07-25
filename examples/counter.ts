@@ -1,9 +1,9 @@
 /**
  * Run example:
- * deno run --allow-read=. --allow-write=. https://raw.githubusercontent.com/felixblaschke/store-o-saurus/master/examples/counter.ts
+ * deno run --allow-read=. --allow-write=. https://raw.githubusercontent.com/felixblaschke/storeosaurus/master/examples/counter.ts
  */
 
-import {Store} from 'https://raw.githubusercontent.com/felixblaschke/store-o-saurus/master/mod.ts';
+import {Store} from 'https://raw.githubusercontent.com/felixblaschke/storeosaurus/master/mod.ts';
 
 interface Counter {
     value: number
