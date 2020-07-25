@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Backend Demo</title>
+</head>
+<body>
+<h1>Backend Demo</h1>
+
+<ul id="listEl"></ul>
+
+<hr>
+<input id="inputEl" type="text">
+<button id="buttonEl">Add</button>
+
+<script>
+    const updateList = async () => {
+        const list = await (await fetch('http://localhost:8080/todo')).json() || [];
+        listEl.innerHTML = '';
+        list.forEach(todo => {
+            const todoEl = document.createElement('li');
+            todoEl.innerText = todo;
+            listEl.appendChild(todoEl);
+        });
+    };
+
+    document.addEventListener('DOMContentLoaded', () => {
+        updateList();
+
+        buttonEl.addEventListener('click', async () => {
+            if (!inputEl.value) {
+                alert('Please fill input form field!');
+                return;
+            }
+
+            await (await fetch('http://localhost:8080/todo', {
+                method: 'POST',
+                headers: {
+                    'Content-type': 'application/json'
+                },
+                body: JSON.stringify({item: inputEl.value})
+            })).text();
+            await updateList();
+            inputEl.value = '';
+        });
+    });
+</script>
+
+</body>
+</html>

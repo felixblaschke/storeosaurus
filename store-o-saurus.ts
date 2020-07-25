@@ -2,39 +2,42 @@ export class Store<T> {
 
     private data: T = {} as T;
 
-    static async open<T>(storeName: string = 'default') {
-        return new Store<T>(storeName);
+    static async open<U>(storeName: string = 'default', options: StoreOptions<U>) {
+        const store = new Store<U>(storeName);
+
+        if (options.default) {
+            await store.applyDefault(options.default)
+        }
+        return store;
     }
 
     private constructor(private name: string) {
     }
 
-    async read(readFunction: (data: T) => any) {
+    async read(fn: (data: T) => any) {
         await this.loadJsonFromDisk();
-        const result = readFunction(this.data);
+        const result = fn(this.data);
         if (result instanceof Promise) {
             await result;
         }
     }
 
 
-    async write(writeFunction: (data: T) => any) {
+    async write(fn: (data: T) => any) {
         await this.loadJsonFromDisk();
-        const result = writeFunction(this.data);
+        const result = fn(this.data);
         if (result instanceof Promise) {
             await result;
         }
         await this.markDataDirty();
     }
 
-    async assure(data: T) {
+    private async applyDefault(data: T) {
         await this.loadJsonFromDisk();
 
         Object.keys(data).forEach(key => {
-            // @ts-ignore
-            if (this.data[key] === undefined) {
-                // @ts-ignore
-                this.data[key] = data[key];
+            if ((this.data as any)[key] === undefined) {
+                (this.data as any)[key] = (data as any)[key];
             }
         });
         await this.markDataDirty();
@@ -62,4 +65,8 @@ export class Store<T> {
     private fileName() {
         return `${this.name}.store.json`;
     }
+}
+
+interface StoreOptions<T> {
+    default: T
 }
