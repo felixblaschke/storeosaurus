@@ -7,7 +7,7 @@ export class StringEncrypter {
     constructor(private token: string) {
     }
 
-    encode = (text: string): string => {
+    encode = (text: string): Uint8Array => {
         const arr = new TextEncoder().encode(text);
         const tokenArr = new TextEncoder().encode(this.token);
         const tokenSum = tokenArr.reduce((a, b) => a + b) % 1000000;
@@ -16,13 +16,11 @@ export class StringEncrypter {
             return (value + tokenArr[index % tokenArr.length] * tokenSum) % 256;
         });
 
-        return newArr.join('-');
+        return newArr;
     };
 
 
-    decode = (text: string): string => {
-        const bytes = text.split('-').map(s => parseInt(s));
-        const arr = new Uint8Array(bytes);
+    decode = (arr: Uint8Array): string => {
         const tokenArr = new TextEncoder().encode(this.token);
         const tokenSum = tokenArr.reduce((a, b) => a + b) % 1000000;
 

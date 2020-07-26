@@ -35,12 +35,14 @@ export class Store<T> {
 
     private async loadJsonFromDisk() {
         try {
-            let file = await Deno.readTextFile(this.storeFilePath);
-            if (file) {
-                if (this.encrypter) {
-                    file = this.encrypter.decode(file);
-                }
+            let file: string;
+            if (this.encrypter) {
+                file = this.encrypter.decode(await Deno.readFile(this.storeFilePath));
+            } else {
+                file = await Deno.readTextFile(this.storeFilePath);
+            }
 
+            if (file) {
                 const document = JSON.parse(file) as any;
                 if (document.isStoreFile && document.type === 'v1') {
                     this.data = document.data;
@@ -53,7 +55,7 @@ export class Store<T> {
             if (e instanceof Deno.errors.NotFound) {
                 this.data = this.options?.default || {} as T;
             } else if (e instanceof SyntaxError) {
-                throw Error("Can not decrypt the storage file. Maybe you are using the wrong passphrase token?")
+                throw Error('Can not decrypt the storage file. Maybe you are using the wrong passphrase token?');
             } else {
                 throw e;
             }
@@ -69,10 +71,10 @@ export class Store<T> {
         });
 
         if (this.encrypter) {
-            file = this.encrypter.encode(file);
+            await Deno.writeFile(this.storeFilePath, this.encrypter.encode(file));
+        } else {
+            await Deno.writeTextFile(this.storeFilePath, file);
         }
-
-        await Deno.writeTextFile(this.storeFilePath, file);
     }
 
     get storeFilePath(): string {
