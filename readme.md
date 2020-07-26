@@ -6,7 +6,7 @@ Features:
 
 - Fully **test-covered** and **type-safe**
 - **Synchronous** file system access by default
-- Supports **encryption** of storage file
+- Supports **encryption** of store file
 
 ## Usage
 
@@ -55,7 +55,7 @@ const untypedStore = await Store.open<any>(options)
 
 | Option | Type | Description |
 | - | - | - |
-| `name` | string | Name of the store. The store file name is derived from it. A store called `books` will create `books.storage.json` |
+| `name` | string | Name of the store. The store file name is derived from it. A store called `books` will create `books.store.json` |
 | `filePath` | string | Custom path to the store file in case giving it a name isn't enought, e.g. `/tmp/my-file.json` |
 | `default` | TypeOfStoreData | When creating the store for the first time, this value is used. If `default` is not defined, it's an empty object.
 | `encrypt` | string | If set, encrypts the store file using the value of `encrypt` as a password. The encryption is not very strong. Don't rely on it. But it's good for obfuscating the data. |
