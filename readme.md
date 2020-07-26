@@ -1,12 +1,14 @@
 # Storeosaurus
 
-Super simple JSON store for [Deno](https://deno.land).
+Simple JSON store for [Deno](https://deno.land).
 
-Features:
+**Features:**
 
 - Fully **test-covered** and **type-safe**
-- **Synchronous** file system access by default
-- Supports **encryption** of store file
+- **Synchronous** file system access by default and **lazy** on demand
+- Supports **encryption** of store files
+- **Migration** functions allow to grow over the time
+
 
 ## Usage
 
