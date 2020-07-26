@@ -9,6 +9,7 @@ export class Store<T> {
     private data?: T;
     private readonly encrypter?: StringEncrypter;
 
+
     /**
      * Opens a store.
      */
@@ -71,14 +72,22 @@ export class Store<T> {
                 file = await Deno.readTextFile(this.storeFilePath);
             }
 
-            if (file) {
-                const document = JSON.parse(file) as any;
-                if (document.isStoreFile && document.type === 'v1') {
-                    this.data = document.data;
+            const document = JSON.parse(file) as any;
+            if (document.isStoreFile && document.type === 'v1') {
+
+
+
+                if (document.version < this.version && this.options.migrate) {
+                    this.data = await this.options.migrate(document.data, document.version);
+                    await this.writeToDisk(true);
                 } else {
-                    // noinspection ExceptionCaughtLocallyJS
-                    throw new Error('Invalid file format');
+                    this.data = document.data;
                 }
+
+
+            } else {
+                // noinspection ExceptionCaughtLocallyJS
+                throw new Error('Invalid file format');
             }
         } catch (e) {
             if (e instanceof Deno.errors.NotFound) {
@@ -99,7 +108,7 @@ export class Store<T> {
         let file = JSON.stringify({
             isStoreFile: true,
             type: 'v1',
-            version: 1,
+            version: this.version,
             data: this.data
         });
 
@@ -122,11 +131,18 @@ export class Store<T> {
     }
 
     /**
+     * Returns the version of the store
+     */
+    get version(): number {
+        return this.options.version || 1;
+    }
+
+    /**
      * Forces the store to reload it's data from the store file.
      * This is only useful when using lazyRead option.
      */
     async reload(): Promise<void> {
-        await this.loadJsonFromDisk(true)
+        await this.loadJsonFromDisk(true);
     }
 
     /**
@@ -134,15 +150,53 @@ export class Store<T> {
      * This is only useful when using lazyWrite option.
      */
     async sync() {
-        await this.writeToDisk(true)
+        await this.writeToDisk(true);
     }
 }
 
 export interface StoreOptions<T> {
+    /**
+     * Store name
+     */
     name?: string;
+
+    /**
+     * Default value when the store is created for the first time
+     */
     default?: T;
+
+    /**
+     * Custom file path for the store file
+     */
     filePath?: string;
+
+    /**
+     * If set, the store will encrypt the data based on the string given
+     */
     encrypt?: string;
+
+    /**
+     * If set to true, the store will not reload the store file for each read.
+     * You can trigger that manually by calling [reload].
+     */
     lazyRead?: boolean;
+
+    /**
+     * If set to true, the store will not automatically synchronize with the store file
+     * on each write. You need to manually call [sync] to synchronize.
+     */
     lazyWrite?: boolean;
+
+    /**
+     * Number representing the iteration of your store data.
+     * Used for the migration process. Defaults to `1`.
+     */
+    version?: number;
+
+    /**
+     * Migration function that is called whenever the stored version is lower then the current version.
+     * Inside the function you need to return an updated variant of the data model.
+     * The stored data's version is passed in by argument `oldVersion`.
+     */
+    migrate?: (oldData: any, oldVersion: number) => Promise<T>;
 }

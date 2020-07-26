@@ -1,4 +1,4 @@
-import {assertEquals, assertThrowsAsync, cleanedRun, exists, Store} from './test_deps.ts';
+import {assertEquals, cleanedRun, Store} from './test_deps.ts';
 
 
 Deno.test('lazy read store', async () => {

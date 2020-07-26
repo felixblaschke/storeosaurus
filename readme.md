@@ -61,9 +61,11 @@ const untypedStore = await Store.open<any>(options)
 | `default` | TypeOfStoreData | When creating the store for the first time, it's initialized with this value. If `default` is not defined, it's an empty object.
 | `encrypt` | string | If set, encrypts the store file using the value of `encrypt` as a password. The encryption is not very strong. Don't rely on it. |
 | `lazyRead` | boolean | If set to `true`, the store will not reload the store file on each read and write. This can lead to data corruption if two instances of `Store` access the same store file. You can manually trigger a reload by calling `reload()`. |
-| `lazyWrite` | boolean | If set to `true`, the store will not synchronize to disk after a write. You need to manually trigger the synchronization by calling `sync()`. Enabling `lazyWrite` will also enable `lazyRead`.
+| `lazyWrite` | boolean | If set to `true`, the store will not synchronize to disk after a write. You need to manually trigger the synchronization by calling `sync()`. Enabling `lazyWrite` will also enable `lazyRead`. |
+| `version` | number | Number representing the iteration of your store data. It's used for migration. The default value is `1`.|
+| `migrate` | Function | The migrate function is used to upgrade your store's data model as your application grows. Read the topic [Migration](#migration) below. |
 
-If no `name` or `filePath` is specified it will name the file `store.json`
+If no `name` or `filePath` is specified the store file will be `store.json`.
 
 ---
 
@@ -111,3 +113,21 @@ Use `reload()` to force the store to reload all data from the store file. This o
 #### sync()
 
 Use `sync()` to flush all unsychronized data from the `Store` instance to the store file. This only makes sense when working with lazy options.
+
+
+### Migration
+
+Over the time the data model of your store might change. Therefor you can increase the `version` number in options. This `version` is `1` by default. Whenever a `Store` loads a store file with a version lower then the current, it trys to call the migrate function. This function can be defined in the options.
+
+```ts
+const store = await Store.open({
+    version: 2,
+    migrate: async (oldData, oldVersion) => {
+        return {
+            books: oldData.bookEntries
+        }
+    }
+})
+```
+
+You can use the `oldVersion` to handle different generations of data models.
