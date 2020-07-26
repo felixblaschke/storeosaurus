@@ -15,16 +15,19 @@ export class Store<T> {
         }
     }
 
-    async read(fn: (data: T) => any) {
+    async read(fn?: (data: T) => any): Promise<T> {
         await this.loadJsonFromDisk();
-        const result = fn(this.data);
-        if (result instanceof Promise) {
-            await result;
+        if (fn) {
+            const result = fn(this.data);
+            if (result instanceof Promise) {
+                await result;
+            }
         }
+        return this.data;
     }
 
 
-    async write(fn: (data: T) => any) {
+    async write(fn: (data: T) => any): Promise<void> {
         await this.loadJsonFromDisk();
         const result = fn(this.data);
         if (result instanceof Promise) {

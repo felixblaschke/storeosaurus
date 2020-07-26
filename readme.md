@@ -66,7 +66,7 @@ If no `name` or `filePath` is specified it will name the file `store.json`
 
 #### write()
 
-Use `write()` to modify the data in your store by supplying a function. This function gets the store data passed as argument:
+Use `write()` to modify the data in your store by supplying a function. This function gets the store data passed as argument.
 
 ```ts
 await store.write(data => data.myValue = 42);
@@ -81,9 +81,13 @@ await store.write(async (data) => {
 
 #### read()
 
-Use `read()` to access data in your store by supplying a function. This function gets the store data passed as argument:
+Use `read()` to access data in your store by awaiting the Promise. Alternativly you can supply a function. This function gets the store data passed as argument.
 
 ```ts
+console.log((await store.read()).myValue);
+
+// or by function:
+
 await store.read(data => console.log(data.myValue));
 
 // or asynchronously:

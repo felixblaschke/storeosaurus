@@ -13,6 +13,8 @@ Deno.test('default store read / write', async () => {
 
         await store1.read(data => assertEquals(data, {name: 'John'}));
 
+        assertEquals(await store1.read(), {name: 'John'})
+
         const store2 = await Store.open<any>();
         await store2.read(data => assertEquals(data, {name: 'John'}));
     });
