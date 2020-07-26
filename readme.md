@@ -29,17 +29,18 @@ await counter.read(data => {
 });
 ```
 
-Other examples:
+Examples:
 
 - [Counter](examples/counter.ts)
 - [CORS-enabled Backend Service](examples/backend.ts)
-- [Encryption](examples/encryption.ts)
+- [Encrypted diary](examples/encryption.ts)
+- [Encrypted diary with lazy writing](examples/lazy.ts)
 
 ### API
 
 #### open()
 
-Use the static method `Store.open()` to open a store. If it doesn't exists yet, it creates one for you.
+Use the static method `Store.open()` to open a store. If it doesn't exist yet, it creates one for you.
 
 ```ts
 const store = await Store.open<TypeOfStoreData>(options)
@@ -56,13 +57,15 @@ const untypedStore = await Store.open<any>(options)
 | Option | Type | Description |
 | - | - | - |
 | `name` | string | Name of the store. The store file name is derived from it. A store called `books` will create `books.store.json` |
-| `filePath` | string | Custom path to the store file in case giving it a name isn't enought, e.g. `/tmp/my-file.json` |
-| `default` | TypeOfStoreData | When creating the store for the first time, this value is used. If `default` is not defined, it's an empty object.
-| `encrypt` | string | If set, encrypts the store file using the value of `encrypt` as a password. The encryption is not very strong. Don't rely on it. But it's good for obfuscating the data. |
-
+| `filePath` | string | Custom path to the store file in case giving it a name isn't enough, e.g. `/tmp/my-file.json` |
+| `default` | TypeOfStoreData | When creating the store for the first time, it's initialized with this value. If `default` is not defined, it's an empty object.
+| `encrypt` | string | If set, encrypts the store file using the value of `encrypt` as a password. The encryption is not very strong. Don't rely on it. |
+| `lazyRead` | boolean | If set to `true`, the store will not reload the store file on each read and write. This can lead to data corruption if two instances of `Store` access the same store file. You can manually trigger a reload by calling `reload()`. |
+| `lazyWrite` | boolean | If set to `true`, the store will not synchronize to disk after a write. You need to manually trigger the synchronization by calling `sync()`. Enabling `lazyWrite` will also enable `lazyRead`.
 
 If no `name` or `filePath` is specified it will name the file `store.json`
 
+---
 
 #### write()
 
@@ -77,7 +80,7 @@ await store.write(async (data) => {
     data.myValue = await valueFromPromiseFn();
 });
 ```
-
+---
 
 #### read()
 
@@ -96,3 +99,15 @@ await store.read(async (data) => {
     await doAsyncFn(data.myValue);
 });
 ```
+
+---
+
+#### reload()
+
+Use `reload()` to force the store to reload all data from the store file. This only makes sense when working with lazy options.
+
+---
+
+#### sync()
+
+Use `sync()` to flush all unsychronized data from the `Store` instance to the store file. This only makes sense when working with lazy options.
