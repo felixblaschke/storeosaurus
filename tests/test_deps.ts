@@ -1,4 +1,4 @@
-export {assertEquals} from 'https://deno.land/std/testing/asserts.ts';
+export * from 'https://deno.land/std/testing/asserts.ts';
 export {exists} from 'https://deno.land/std/fs/mod.ts';
 export {Store, StoreOptions} from '../mod.ts';
 

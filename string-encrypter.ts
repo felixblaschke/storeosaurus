@@ -16,12 +16,12 @@ export class StringEncrypter {
             return (value + tokenArr[index % tokenArr.length] * tokenSum) % 256;
         });
 
-        return LZString.compressToBase64(newArr.join('-')) as string;
+        return newArr.join('-');
     };
 
 
     decode = (text: string): string => {
-        const bytes = (LZString.decompressFromBase64(text) as string).split('-').map(s => parseInt(s));
+        const bytes = text.split('-').map(s => parseInt(s));
         const arr = new Uint8Array(bytes);
         const tokenArr = new TextEncoder().encode(this.token);
         const tokenSum = tokenArr.reduce((a, b) => a + b) % 1000000;
