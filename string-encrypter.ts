@@ -1,7 +1,5 @@
-import {LZString} from './lz-string.js';
-
 /**
- * Simple unsafe string encrypter. Don't use it for security relevant application. It just meant for obfuscation .
+ * Simple string encrypter. Encryption is not very strong.
  */
 export class StringEncrypter {
     constructor(private token: string) {
