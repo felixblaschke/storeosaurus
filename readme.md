@@ -15,15 +15,16 @@ interface Counter {
     value: number
 }
 
-const counter = await Store.open<Counter>('counter', {
+const counter = await Store.open<Counter>({
+    name: 'counter',
     default: {value: 0}
 });
 
-await counter.write( data => data.value++);
+await counter.write(data => data.value++);
 
 await counter.read(data => {
-    console.log("Counter: ", data.value);
-})
+    console.log('Counter: ', data.value);
+});
 ```
 
 See [examples](examples/) for more usages.

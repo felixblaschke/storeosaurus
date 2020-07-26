@@ -31,12 +31,17 @@ export class Store<T> {
         try {
             const file = await Deno.readTextFile(this.storeFilePath);
             if (file) {
-                this.data = JSON.parse(file) as T;
+                const document = JSON.parse(file) as any;
+                if (document.isStoreFile && document.type === 'v1') {
+                    this.data = document.data;
+                } else {
+                    // noinspection ExceptionCaughtLocallyJS
+                    throw new Error('Invalid file format');
+                }
             }
         } catch (e) {
-
             if (e instanceof Deno.errors.NotFound) {
-                this.data = this.options?.default ||  {} as T
+                this.data = this.options?.default || {} as T;
             } else {
                 throw e;
             }
@@ -44,12 +49,17 @@ export class Store<T> {
     }
 
     private async writeToDisk() {
-        await Deno.writeTextFile(this.storeFilePath, JSON.stringify(this.data));
+        await Deno.writeTextFile(this.storeFilePath, JSON.stringify({
+            isStoreFile: true,
+            type: 'v1',
+            version: 1,
+            data: this.data
+        }));
     }
 
     get storeFilePath(): string {
         if (!this.options?.name && !this.options?.filePath) {
-            return 'store.json'
+            return 'store.json';
         }
 
         return this.options?.filePath || `${this.options?.name?.toLowerCase()}.store.json`;
@@ -60,4 +70,5 @@ export interface StoreOptions<T> {
     name?: string;
     default?: T;
     filePath?: string;
+    encrypt?: string;
 }

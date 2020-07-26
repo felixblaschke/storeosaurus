@@ -86,7 +86,32 @@ Deno.test('store file names', async () => {
         await store4.write(() => null);
         assertEquals(await exists('custom-book-file.store.json'), true);
         assertEquals(await exists('books.store.json'), false);
+    });
+});
 
 
+Deno.test('default values options', async () => {
+    await cleanedRun(async () => {
+        const store1 = await Store.open<any>();
+        await store1.read(data => assertEquals(data, {}));
+
+        const store2 = await Store.open<any>({
+            default: {
+                name: 'John',
+                array: [1, 2, 3],
+                object: {
+                    foo: 'bar'
+                }
+            }
+        });
+        await store2.read(data => {
+            assertEquals(data, {
+                name: 'John',
+                array: [1, 2, 3],
+                object: {
+                    foo: 'bar'
+                }
+            });
+        });
     });
 });
