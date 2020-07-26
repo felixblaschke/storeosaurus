@@ -2,16 +2,11 @@ export class Store<T> {
 
     private data: T = {} as T;
 
-    static async open<U>(storeName: string = 'default', options?: StoreOptions<U>) {
-        const store = new Store<U>(options?.filePath || `${this.name}.store.json`);
-
-        if (options?.default) {
-            await store.applyDefault(options.default)
-        }
-        return store;
+    static async open<U>(options: StoreOptions<U> = {}) {
+        return new Store<U>(options);
     }
 
-    private constructor(private filePath: string) {
+    private constructor(private options: StoreOptions<T>) {
     }
 
     async read(fn: (data: T) => any) {
@@ -29,42 +24,40 @@ export class Store<T> {
         if (result instanceof Promise) {
             await result;
         }
-        await this.markDataDirty();
-    }
-
-    private async applyDefault(data: T) {
-        await this.loadJsonFromDisk();
-
-        Object.keys(data).forEach(key => {
-            if ((this.data as any)[key] === undefined) {
-                (this.data as any)[key] = (data as any)[key];
-            }
-        });
-        await this.markDataDirty();
+        await this.writeToDisk();
     }
 
     private async loadJsonFromDisk() {
         try {
-            const file = await Deno.readTextFile(this.filePath);
+            const file = await Deno.readTextFile(this.storeFilePath);
             if (file) {
                 this.data = JSON.parse(file) as T;
             }
         } catch (e) {
+
             if (e instanceof Deno.errors.NotFound) {
-                // it's okay
+                this.data = this.options?.default ||  {} as T
             } else {
                 throw e;
             }
         }
     }
 
-    private async markDataDirty() {
-        await Deno.writeTextFile(this.filePath, JSON.stringify(this.data));
+    private async writeToDisk() {
+        await Deno.writeTextFile(this.storeFilePath, JSON.stringify(this.data));
     }
 
+    get storeFilePath(): string {
+        if (!this.options?.name && !this.options?.filePath) {
+            return 'store.json'
+        }
+
+        return this.options?.filePath || `${this.options?.name?.toLowerCase()}.store.json`;
+    }
 }
 
-interface StoreOptions<T> {
+export interface StoreOptions<T> {
+    name?: string;
     default?: T;
-    filePath: string;
+    filePath?: string;
 }

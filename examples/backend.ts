@@ -5,20 +5,21 @@
 
 import {Application, Router} from 'https://deno.land/x/oak/mod.ts';
 import {oakCors} from 'https://deno.land/x/cors/mod.ts';
-import {Store} from 'https://raw.githubusercontent.com/felixblaschke/storeosaurus/master/mod.ts';
+import {Store} from '../mod.ts';
 
 interface MyList {
     todos: string[]
 }
 
-const myList = await Store.open<MyList>('my-list', {
+const myList = await Store.open<MyList>({
+    name: 'my-list',
     default: {todos: []}
 });
 
 const router = new Router();
 router
     .get('/', async (context) => {
-        context.response.body = await (await fetch("https://raw.githubusercontent.com/felixblaschke/storeosaurus/master/examples/backend.html")).text()
+        context.response.body = await (await fetch('https://raw.githubusercontent.com/felixblaschke/storeosaurus/master/examples/backend.html')).text();
     })
     .get('/todo', async (context) => {
         await myList.read(data => context.response.body = data.todos);
@@ -34,5 +35,5 @@ const app = new Application();
 app.use(oakCors());
 app.use(router.routes());
 
-console.info(`CORS-enabled backend with persistence listening on port 8080`);
+console.info(`CORS-enabled backend with persistence listening: http://localhost:8080/`);
 await app.listen({port: 8080});
