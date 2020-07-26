@@ -33,7 +33,7 @@ Other examples:
 
 - [Counter](examples/counter.ts)
 - [CORS-enabled Backend Service](examples/backend.ts)
-
+- [Encryption](exmaples/encryption.ts)
 
 ### API
 
