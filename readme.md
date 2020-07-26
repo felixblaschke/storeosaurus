@@ -81,7 +81,7 @@ await store.write(async (data) => {
 
 #### read()
 
-Use `read()` to access data in your store by awaiting the Promise. Alternativly you can supply a function. This function gets the store data passed as argument.
+Use `read()` to access data in your store by awaiting the Promise. Alternatively you can supply a function. This function gets the store data passed as argument.
 
 ```ts
 console.log((await store.read()).myValue);
