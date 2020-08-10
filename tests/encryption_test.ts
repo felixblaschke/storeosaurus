@@ -15,10 +15,10 @@ Deno.test('encrypted store', async () => {
         const store1 = await Store.open<any>({
             encrypt: 'secret-passphrase'
         });
-        await store1.write(data => data.person = testData);
+        store1.set({person: testData});
 
         assertEquals(await exists('store.json'), true);
-        const file = await Deno.readTextFile('store.json');
+        const file = Deno.readTextFileSync('store.json');
         assertEquals(file.includes('John'), false);
         assertEquals(file.includes('Doe'), false);
         assertEquals(file.includes('Peter'), false);
@@ -28,12 +28,12 @@ Deno.test('encrypted store', async () => {
         const store2 = await Store.open<any>({
             encrypt: 'secret-passphrase'
         });
-        await store2.read(data => assertEquals(data.person, testData));
+        assertEquals(store2.get().person, testData);
 
         const store3 = await Store.open<any>({
             encrypt: 'invalid-passphrase'
         });
-        assertThrowsAsync(async () => await store3.read(() => null), Error, 'Can not decrypt the storage file. Maybe you are using the wrong passphrase token?');
+        assertThrowsAsync(async () => store3.get(), Error, 'Can not decrypt the storage file. Maybe you are using the wrong passphrase token?');
 
     });
 });

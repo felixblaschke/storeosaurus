@@ -7,7 +7,7 @@ Deno.test('migration', async () => {
 
         assertEquals(store1.version, 1);
 
-        await store1.write(data => data.value = 42);
+        store1.set({value: 42});
 
         // days later...
 
@@ -17,7 +17,7 @@ Deno.test('migration', async () => {
 
         const store2 = await Store.open<NewModel>({
             version: 2,
-            migrate: async (oldData: any, oldVersion: number) => {
+            migrate: (oldData: any, oldVersion: number) => {
                 if (oldVersion === 1) {
                     return {
                         counter: oldData.value
@@ -29,7 +29,7 @@ Deno.test('migration', async () => {
         });
 
         assertEquals(store2.version, 2);
-        assertEquals(await store2.read(), {counter: 42});
+        assertEquals(store2.get(), {counter: 42});
 
     });
 });
@@ -40,7 +40,7 @@ Deno.test('migration without function', async () => {
         const store1 = await Store.open<any>();
 
         assertEquals(store1.version, 1);
-        await store1.write(data => data.value = 42);
+        store1.set({value: 42});
 
         // days later...
 
@@ -49,7 +49,7 @@ Deno.test('migration without function', async () => {
         });
 
         assertEquals(store2.version, 2);
-        assertEquals(await store2.read(), {value: 42});
+        assertEquals(store2.get(), {value: 42});
     });
 });
 
@@ -60,7 +60,7 @@ Deno.test('migration function with same version', async () => {
             version: 2
         });
 
-        await store1.write(data => data.value = 42);
+        store1.set({value: 42});
 
         // days later...
 
@@ -71,7 +71,7 @@ Deno.test('migration function with same version', async () => {
             },
         });
 
-        assertEquals(await store2.read(), {value: 42});
+        assertEquals(store2.get(), {value: 42});
     });
 });
 

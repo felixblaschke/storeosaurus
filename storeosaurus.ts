@@ -13,7 +13,7 @@ export class Store<T> {
     /**
      * Opens a store.
      */
-    static async open<U>(options: StoreOptions<U> = {}) {
+    static open<U>(options: StoreOptions<U> = {}) {
         return new Store<U>(options);
     }
 
@@ -29,15 +29,9 @@ export class Store<T> {
     /**
      * Reads data from the store
      */
-    async read(fn?: (data: T) => any): Promise<T> {
-        await this.loadJsonFromDisk();
+    get(): T {
+        this.loadJsonFromDisk();
         if (this.data) {
-            if (fn) {
-                const result = fn(this.data);
-                if (result instanceof Promise) {
-                    await result;
-                }
-            }
             return this.data;
         }
         throw new Error('Could not access data. Something went wrong while loading.');
@@ -46,20 +40,17 @@ export class Store<T> {
     /**
      * Writes data to the store.
      */
-    async write(fn: (data: T) => any): Promise<void> {
-        await this.loadJsonFromDisk();
+    set(data: T): void {
+        this.loadJsonFromDisk();
         if (this.data) {
-            const result = fn(this.data);
-            if (result instanceof Promise) {
-                await result;
-            }
-            await this.writeToDisk();
+            this.data = data;
+            this.writeToDisk();
         } else {
             throw new Error('Could not access data. Something went wrong while loading.');
         }
     }
 
-    private async loadJsonFromDisk(force = false): Promise<void> {
+    private loadJsonFromDisk(force = false): void {
         if (!force && this.options.lazyRead === true && this.data) {
             return;
         }
@@ -67,19 +58,18 @@ export class Store<T> {
         try {
             let file: string;
             if (this.encrypter) {
-                file = this.encrypter.decode(await Deno.readFile(this.storeFilePath));
+                file = this.encrypter.decode(Deno.readFileSync(this.storeFilePath));
             } else {
-                file = await Deno.readTextFile(this.storeFilePath);
+                file = Deno.readTextFileSync(this.storeFilePath);
             }
 
             const document = JSON.parse(file) as any;
             if (document.isStoreFile && document.type === 'v1') {
 
 
-
                 if (document.version < this.version && this.options.migrate) {
-                    this.data = await this.options.migrate(document.data, document.version);
-                    await this.writeToDisk(true);
+                    this.data = this.options.migrate(document.data, document.version);
+                    this.writeToDisk(true);
                 } else {
                     this.data = document.data;
                 }
@@ -100,7 +90,7 @@ export class Store<T> {
         }
     }
 
-    private async writeToDisk(force = false): Promise<void> {
+    private writeToDisk(force = false): void {
         if (!force && this.options.lazyWrite) {
             return;
         }
@@ -113,9 +103,9 @@ export class Store<T> {
         });
 
         if (this.encrypter) {
-            await Deno.writeFile(this.storeFilePath, this.encrypter.encode(file));
+            Deno.writeFileSync(this.storeFilePath, this.encrypter.encode(file));
         } else {
-            await Deno.writeTextFile(this.storeFilePath, file);
+            Deno.writeTextFileSync(this.storeFilePath, file);
         }
     }
 
@@ -141,16 +131,16 @@ export class Store<T> {
      * Forces the store to reload it's data from the store file.
      * This is only useful when using lazyRead option.
      */
-    async reload(): Promise<void> {
-        await this.loadJsonFromDisk(true);
+    reload(): void {
+        this.loadJsonFromDisk(true);
     }
 
     /**
      * Flushes all data to the store file.
      * This is only useful when using lazyWrite option.
      */
-    async sync() {
-        await this.writeToDisk(true);
+    sync(): void {
+        this.writeToDisk(true);
     }
 }
 
@@ -198,5 +188,5 @@ export interface StoreOptions<T> {
      * Inside the function you need to return an updated variant of the data model.
      * The stored data's version is passed in by argument `oldVersion`.
      */
-    migrate?: (oldData: any, oldVersion: number) => Promise<T>;
+    migrate?: (oldData: any, oldVersion: number) => T;
 }

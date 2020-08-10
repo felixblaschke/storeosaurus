@@ -11,7 +11,7 @@ export const cleanedRun = async (fn: () => Promise<void>) => {
 const removeAllStoreFilesInDirectory = async () => {
     for await (const dirEntry of Deno.readDir('.')) {
         if (dirEntry.isFile && dirEntry.name.endsWith('store.json')) {
-            await Deno.remove(`./${dirEntry.name}`);
+            Deno.removeSync(`./${dirEntry.name}`);
         }
     }
 };

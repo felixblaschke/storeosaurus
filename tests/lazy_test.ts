@@ -3,35 +3,38 @@ import {assertEquals, cleanedRun, Store} from './test_deps.ts';
 
 Deno.test('lazy read store', async () => {
     await cleanedRun(async () => {
-        const store1 = await Store.open<any>({lazyRead: true});
+        const store1 = Store.open<any>({lazyRead: true});
 
-        await store1.write(data => data.name = 'John');
+        store1.set({name: 'John'});
 
-        const store2 = await Store.open<any>({lazyRead: true});
-        assertEquals(await store2.read(), {name: 'John'});
+        const store2 = Store.open<any>({lazyRead: true});
+        assertEquals(store2.get(), {name: 'John'});
 
-        await store2.write(data => data.age = 42);
-        assertEquals(await store2.read(), {name: 'John', age: 42});
+        store2.set({
+            ...store2.get(),
+            age: 42
+        });
+        assertEquals(store2.get(), {name: 'John', age: 42});
 
-        assertEquals(await store1.read(), {name: 'John'});
+        assertEquals(store1.get(), {name: 'John'});
 
-        await store1.reload();
-        assertEquals(await store1.read(), {name: 'John', age: 42});
+        store1.reload();
+        assertEquals(store1.get(), {name: 'John', age: 42});
     });
 });
 
 
 Deno.test('lazy write store', async () => {
     await cleanedRun(async () => {
-        const store1 = await Store.open<any>({lazyWrite: true});
-        await store1.write(data => data.name = 'John');
-        assertEquals(await store1.read(), {name: 'John'});
+        const store1 = Store.open<any>({lazyWrite: true});
+        store1.set({name: 'John'});
+        assertEquals(store1.get(), {name: 'John'});
 
         const store2 = await Store.open<any>();
-        assertEquals(await store2.read(), {});
+        assertEquals(store2.get(), {});
 
-        await store1.sync()
+        store1.sync()
 
-        assertEquals(await store2.read(), {name: 'John'});
+        assertEquals(store2.get(), {name: 'John'});
     });
 });
