@@ -9,13 +9,11 @@ interface Counter {
     value: number
 }
 
-const counter = await Store.open<Counter>({
+const counter = Store.open<Counter>({
     name: 'counter',
     default: {value: 0}
 });
 
-await counter.write(data => data.value++);
+counter.set({value: counter.get().value + 1});
 
-await counter.read(data => {
-    console.log('Counter: ', data.value);
-});
+console.log('Counter: ', counter.get().value);

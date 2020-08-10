@@ -7,8 +7,8 @@ import {Application, Router, BodyJson} from 'https://deno.land/x/oak@v6.0.1/mod.
 import {oakCors} from 'https://deno.land/x/cors@v1.0.0/mod.ts';
 import {Store} from '../mod.ts';
 
-const getStore = async (name: string) => {
-    return await Store.open<any>({name,});
+const getStore =  (name: string): Store<any> => {
+    return  Store.open<any>({name,});
 }
 
 
@@ -20,8 +20,7 @@ router
     .get('/:store', async (context) => {
         const storeName = context.params.store;
         if (storeName && /^[a-z]+$/ig.test(storeName)) {
-            const store = await getStore(storeName);
-            context.response.body = JSON.stringify((await store.read()).json);
+            context.response.body = JSON.stringify(getStore(storeName).get().json);
         } else {
             context.response.body = "Illegal store name";
         }
@@ -33,8 +32,7 @@ router
 
         if (storeName && /^[a-z]+$/ig.test(storeName)) {
             console.log("access on store ", storeName)
-            const store = await getStore(storeName);
-            await store.write((data) => data.json = json)
+            getStore(storeName).set({json})
             context.response.body = json;
         } else {
             context.response.body = "Illegal store name";

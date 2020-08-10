@@ -11,7 +11,7 @@ interface MyList {
     todos: string[]
 }
 
-const myList = await Store.open<MyList>({
+const myList = Store.open<MyList>({
     name: 'my-list',
     default: {todos: []}
 });
@@ -23,12 +23,14 @@ router
         context.response.body = await (await fetch('https://raw.githubusercontent.com/felixblaschke/storeosaurus/master/examples/backend.html')).text();
     })
     .get('/todo', async (context) => {
-        await myList.read(data => context.response.body = data.todos);
+        context.response.body = myList.get().todos
     })
     .post('/todo', async (context) => {
         const bodyJson: BodyJson = context.request.body({ type: 'json' });
         const json: { item: string } = await bodyJson.value;
-        await myList.write(data => data.todos.push(json.item));
+        const data = myList.get();
+        data.todos.push(json.item);
+        myList.set(data);
         context.response.body = 'ok';
     });
 
