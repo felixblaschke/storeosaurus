@@ -3,7 +3,7 @@
  * deno run --allow-net --allow-read=. --allow-write=. https://raw.githubusercontent.com/felixblaschke/storeosaurus/master/examples/backend.ts
  */
 
-import {Application, Router} from 'https://deno.land/x/oak@v6.0.1/mod.ts';
+import {Application, Router, BodyJson} from 'https://deno.land/x/oak@v6.0.1/mod.ts';
 import {oakCors} from 'https://deno.land/x/cors@v1.0.0/mod.ts';
 import {Store} from '../mod.ts';
 
@@ -16,6 +16,7 @@ const myList = await Store.open<MyList>({
     default: {todos: []}
 });
 
+
 const router = new Router();
 router
     .get('/', async (context) => {
@@ -25,8 +26,9 @@ router
         await myList.read(data => context.response.body = data.todos);
     })
     .post('/todo', async (context) => {
-        const body: { item: string } = await (await context.request.body({type: 'json'})).value;
-        await myList.write(data => data.todos.push(body.item));
+        const bodyJson: BodyJson = context.request.body({ type: 'json' });
+        const json: { item: string } = await bodyJson.value;
+        await myList.write(data => data.todos.push(json.item));
         context.response.body = 'ok';
     });
 
