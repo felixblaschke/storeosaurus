@@ -31,7 +31,7 @@ Deno.test('lazy write store', async () => {
         assertEquals(store1.get(), {name: 'John'});
 
         const store2 = await Store.open<any>();
-        assertEquals(store2.get(), {});
+        assertEquals(store2.get(), undefined);
 
         store1.sync()
 

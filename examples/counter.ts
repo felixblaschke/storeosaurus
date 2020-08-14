@@ -5,15 +5,11 @@
 
 import {Store} from '../mod.ts';
 
-interface Counter {
-    value: number
-}
-
-const counter = Store.open<Counter>({
+const counter = Store.open<number>({
     name: 'counter',
-    default: {value: 0}
+    default: 0
 });
 
-counter.set({value: counter.get().value + 1});
+counter.set(counter.get() + 1);
 
-console.log('Counter: ', counter.get().value);
+console.log('Counter: ', counter.get());

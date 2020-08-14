@@ -31,10 +31,7 @@ export class Store<T> {
      */
     get(): T {
         this.loadJsonFromDisk();
-        if (this.data) {
-            return this.data;
-        }
-        throw new Error('Could not access data. Something went wrong while loading.');
+        return this.data as T;
     }
 
     /**
@@ -42,12 +39,8 @@ export class Store<T> {
      */
     set(data: T): void {
         this.loadJsonFromDisk();
-        if (this.data) {
-            this.data = data;
-            this.writeToDisk();
-        } else {
-            throw new Error('Could not access data. Something went wrong while loading.');
-        }
+        this.data = data;
+        this.writeToDisk();
     }
 
     private loadJsonFromDisk(force = false): void {
@@ -81,7 +74,7 @@ export class Store<T> {
             }
         } catch (e) {
             if (e instanceof Deno.errors.NotFound) {
-                this.data = this.options?.default || {} as T;
+                this.data = this.options?.default as T;
             } else if (this.encrypter && e instanceof SyntaxError) {
                 throw Error('Can not decrypt the storage file. Maybe you are using the wrong passphrase token?');
             } else {

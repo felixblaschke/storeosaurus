@@ -13,22 +13,16 @@ Simple JSON store for [Deno](https://deno.land).
 ## Usage
 
 ```ts
-import {Store} from 'https://raw.githubusercontent.com/felixblaschke/storeosaurus/master/mod.ts';
+import {Store} from 'https://raw.githubusercontent.com/felixblaschke/storeosaurus/2.0.0/mod.ts';
 
-interface Counter {
-    value: number
-}
-
-const counter = await Store.open<Counter>({
+const counter = Store.open<number>({
     name: 'counter',
-    default: {value: 0}
+    default: 0
 });
 
-await counter.write(data => data.value++);
+counter.set(counter.get() + 1);
 
-await counter.read(data => {
-    console.log('Counter: ', data.value);
-});
+console.log('Counter: ', counter.get());
 ```
 
 Examples:
@@ -45,13 +39,13 @@ Examples:
 Use the static method `Store.open()` to open a store. If it doesn't exist yet, it creates one for you.
 
 ```ts
-const store = await Store.open<TypeOfStoreData>(options)
+const store = Store.open<TypeOfStoreData>(options)
 ```
 
 If you don't want to work type-safe you can specify `any`:
 
 ```ts
-const untypedStore = await Store.open<any>(options)
+const untypedStore = Store.open<any>(options)
 ```
 
 **Available options are**
@@ -71,37 +65,22 @@ If no `name` or `filePath` is specified the store file will be `store.json`.
 
 ---
 
-#### write()
+#### set()
 
-Use `write()` to modify the data in your store by supplying a function. This function gets the store data passed as argument.
+Use `set()` to modify the data.
 
 ```ts
-await store.write(data => data.myValue = 42);
-
-// or asynchronously:
-
-await store.write(async (data) => {
-    data.myValue = await valueFromPromiseFn();
-});
+store.set({myValue: 42});
 ```
 ---
 
-#### read()
+#### get()
 
-Use `read()` to access data in your store by awaiting the Promise. Alternatively you can supply a function. This function gets the store data passed as argument.
+Use `get()` to access data in your store.
 
 ```ts
-console.log((await store.read()).myValue);
-
-// or by function:
-
-await store.read(data => console.log(data.myValue));
-
-// or asynchronously:
-
-await store.read(async (data) => {
-    await doAsyncFn(data.myValue);
-});
+const value = store.get();
+console.log(value);
 ```
 
 ---
@@ -122,7 +101,7 @@ Use `sync()` to flush all unsychronized data from the `Store` instance to the st
 Over the time the data model of your store might change. Therefor you can increase the `version` number in options. This `version` is `1` by default. Whenever a `Store` loads a store file with a version lower then the current, it trys to call the migrate function. This function can be defined in the options.
 
 ```ts
-const store = await Store.open({
+const store = Store.open({
     version: 2,
     migrate: async (oldData, oldVersion) => {
         return {

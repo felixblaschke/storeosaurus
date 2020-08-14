@@ -1,10 +1,25 @@
 import {assertEquals, cleanedRun, exists, Store, StoreOptions} from './test_deps.ts';
 
 
+Deno.test('counter', async () => {
+    await cleanedRun(async () => {
+        const store1 = Store.open<number>({default: 0});
+        const store2 = Store.open<number>({default: 0});
+
+        assertEquals(store1.get(), 0)
+        store1.set(store1.get() + 1);
+        assertEquals(store1.get(), 1)
+
+        store2.set(store2.get() + 1);
+        assertEquals(store2.get(), 2)
+    });
+});
+
+
 Deno.test('default store read / write', async () => {
     await cleanedRun(async () => {
         const store1 = Store.open<any>();
-        assertEquals(store1.get(), {})
+        assertEquals(store1.get(), undefined)
 
         store1.set({name: 'John'});
 
@@ -94,7 +109,7 @@ Deno.test('store file names', async () => {
 Deno.test('default values options', async () => {
     await cleanedRun(async () => {
         const store1 = Store.open<any>();
-        assertEquals(store1.get(), {});
+        assertEquals(store1.get(), undefined);
 
         const store2 = Store.open<any>({
             default: {
