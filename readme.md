@@ -13,7 +13,7 @@ Simple JSON store for [Deno](https://deno.land).
 ## Usage
 
 ```ts
-import {Store} from 'https://raw.githubusercontent.com/felixblaschke/storeosaurus/2.0.0/mod.ts';
+import {Store} from 'https://deno.land/x/storeosaurus@2.0.1/mod.ts';
 
 const counter = Store.open<number>({
     name: 'counter',
