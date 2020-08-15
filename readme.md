@@ -96,6 +96,7 @@ Use `reload()` to force the store to reload all data from the store file. This o
 Use `sync()` to flush all unsychronized data from the `Store` instance to the store file. This only makes sense when working with lazy options.
 
 
+
 ### Migration
 
 Over the time the data model of your store might change. Therefor you can increase the `version` number in options. This `version` is `1` by default. Whenever a `Store` loads a store file with a version lower then the current, it trys to call the migrate function. This function can be defined in the options.
