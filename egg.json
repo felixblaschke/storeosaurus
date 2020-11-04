@@ -1,0 +1,10 @@
+{
+    "name": "storeosaurus",
+    "description": "Deno JSON Store",
+    "homepage": "https://github.com/felixblaschke/storeosaurus",
+    "files": [
+    "./**/*.ts",
+    "README.md"
+    ],
+    "entry": "./mod.ts"
+}
